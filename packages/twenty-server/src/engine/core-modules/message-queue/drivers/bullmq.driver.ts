@@ -92,7 +92,7 @@ export class BullMQDriver
     ]);
   }
 
-  async work<T>(
+  work<T>(
     queueName: MessageQueue,
     handler: (job: MessageQueueJob<T>) => Promise<void>,
     options?: MessageQueueWorkerOptions,
@@ -113,6 +113,15 @@ export class BullMQDriver
       async (job) =>
         Sentry.withIsolationScope(async () => {
           applyWorkspaceSentryContextFromJobData(job.data);
+
+          const queueLatency = Math.max(0, Date.now() - job.timestamp);
+
+          this.metricsService.recordHistogram({
+            key: MetricsKeys.JobLatencyMs,
+            value: queueLatency,
+            unit: 'ms',
+            attributes: { queue: queueName, job_name: job.name },
+          });
 
           // TODO: Correctly support for job.id
           const timeStart = performance.now();
@@ -136,7 +145,7 @@ export class BullMQDriver
     );
 
     this.workerMap[queueName].on('completed', (job) => {
-      this.metricsService.incrementCounter({
+      void this.metricsService.incrementCounterForEvent({
         key: MetricsKeys.JobCompleted,
         attributes: { queue: queueName, job_name: job?.name ?? '' },
         shouldStoreInCache: false,
@@ -148,7 +157,7 @@ export class BullMQDriver
         return;
       }
 
-      this.metricsService.incrementCounter({
+      void this.metricsService.incrementCounterForEvent({
         key: MetricsKeys.JobFailed,
         attributes: {
           queue: queueName,

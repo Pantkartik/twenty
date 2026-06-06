@@ -7,6 +7,7 @@ import {
 } from 'twenty-shared/types';
 
 export const EXPECTED_MANIFEST: Manifest = {
+  commandMenuItems: [],
   application: {
     universalIdentifier: 'e1e2e3e4-e5e6-4000-8000-000000000001',
     displayName: 'Root App',
@@ -15,9 +16,11 @@ export const EXPECTED_MANIFEST: Manifest = {
     packageJsonChecksum: '[checksum]',
     yarnLockChecksum: '[checksum]',
   },
+  permissionFlags: [],
   skills: [],
   agents: [],
   publicAssets: [],
+  indexes: [],
   fields: [
     {
       name: 'targetMyNote',
@@ -295,7 +298,6 @@ export const EXPECTED_MANIFEST: Manifest = {
       sourceHandlerPath: 'my.function.ts',
       builtHandlerPath: 'my.function.mjs',
       builtHandlerChecksum: '[checksum]',
-      toolInputSchema: { type: 'object', properties: {} },
     },
   ],
   frontComponents: [
@@ -312,6 +314,7 @@ export const EXPECTED_MANIFEST: Manifest = {
     },
   ],
   views: [],
+  viewFields: [],
   navigationMenuItems: [],
   pageLayouts: [],
   pageLayoutTabs: [],
@@ -330,7 +333,7 @@ export const EXPECTED_MANIFEST: Manifest = {
       canBeAssignedToApiKeys: false,
       fieldPermissions: [],
       objectPermissions: [],
-      permissionFlags: [],
+      permissionFlagUniversalIdentifiers: [],
     },
   ],
 };

@@ -18,14 +18,17 @@ const buildMinimalManifest = (
   fields: [],
   logicFunctions: [],
   frontComponents: [],
+  permissionFlags: [],
   roles: [],
   skills: [],
   agents: [],
   publicAssets: [],
   views: [],
+  viewFields: [],
   navigationMenuItems: [],
   pageLayouts: [],
   pageLayoutTabs: [],
+  commandMenuItems: [],
 });
 
 describe('resolveManifestAssetUrls', () => {

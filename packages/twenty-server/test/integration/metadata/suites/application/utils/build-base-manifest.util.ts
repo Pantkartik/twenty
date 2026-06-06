@@ -25,6 +25,7 @@ export const buildBaseManifest = ({
       description: 'A test role',
     },
   ],
+  permissionFlags: [],
   skills: [],
   agents: [],
   objects: [],
@@ -33,8 +34,10 @@ export const buildBaseManifest = ({
   frontComponents: [],
   publicAssets: [],
   views: [],
+  viewFields: [],
   navigationMenuItems: [],
   pageLayouts: [],
   pageLayoutTabs: [],
+  commandMenuItems: [],
   ...overrides,
 });

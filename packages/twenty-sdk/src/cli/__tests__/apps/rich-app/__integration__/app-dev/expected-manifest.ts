@@ -1,6 +1,6 @@
 import { FieldType } from '@/sdk/define';
 import type { Manifest } from 'twenty-shared/application';
-import { PermissionFlagType } from 'twenty-shared/constants';
+import { SystemPermissionFlag } from 'twenty-shared/constants';
 import {
   FieldMetadataType,
   NavigationMenuItemType,
@@ -12,6 +12,8 @@ import {
 } from 'twenty-shared/types';
 
 export const EXPECTED_MANIFEST: Manifest = {
+  commandMenuItems: [],
+  permissionFlags: [],
   pageLayouts: [],
   pageLayoutTabs: [
     {
@@ -117,6 +119,19 @@ export const EXPECTED_MANIFEST: Manifest = {
       universalIdentifier: 'f1234567-abcd-4000-8000-000000000001',
       isHeadless: false,
       usesSdkClient: false,
+    },
+  ],
+
+  indexes: [
+    {
+      universalIdentifier: 'b6e9d2a1-5a4c-46ca-9d52-42c8f02d1ff0',
+      objectUniversalIdentifier: '54b589ca-eeed-4950-a176-358418b85c05',
+      fields: [
+        {
+          universalIdentifier: 'b6e9d2a1-5a4c-46ca-9d52-42c8f02d1ff1',
+          fieldUniversalIdentifier: '87b675b8-dd8c-4448-b4ca-20e5a2234a1e',
+        },
+      ],
     },
   ],
 
@@ -1384,7 +1399,7 @@ export const EXPECTED_MANIFEST: Manifest = {
       universalIdentifier: 'c0c1c2c3-c4c5-4000-8000-000000000001',
       fieldPermissions: [],
       objectPermissions: [],
-      permissionFlags: [],
+      permissionFlagUniversalIdentifiers: [],
     },
     {
       canBeAssignedToAgents: false,
@@ -1416,12 +1431,7 @@ export const EXPECTED_MANIFEST: Manifest = {
           objectUniversalIdentifier: '54b589ca-eeed-4950-a176-358418b85c05',
         },
       ],
-      permissionFlags: [
-        {
-          universalIdentifier: '01d7865a-7700-5d49-b2aa-62623c2cbac7',
-          flag: PermissionFlagType.APPLICATIONS,
-        },
-      ],
+      permissionFlagUniversalIdentifiers: [SystemPermissionFlag.APPLICATIONS],
       universalIdentifier: 'b648f87b-1d26-4961-b974-0908fd991061',
     },
   ],
@@ -1512,31 +1522,31 @@ export const EXPECTED_MANIFEST: Manifest = {
           fieldValue: 'DRAFT',
           isVisible: true,
           position: 0,
-          universalIdentifier: 'bg1a2b3c-0001-4a7b-8c9d-0e1f2a3b4c5d',
+          universalIdentifier: 'e9ed34f1-3c3d-41b1-869b-00aae0033d9c',
         },
         {
           fieldValue: 'SENT',
           isVisible: true,
           position: 1,
-          universalIdentifier: 'bg1a2b3c-0002-4a7b-8c9d-0e1f2a3b4c5d',
+          universalIdentifier: '19b1a3c1-53f0-4d32-b072-d645dac98e38',
         },
         {
           fieldValue: 'DELIVERED',
           isVisible: true,
           position: 2,
-          universalIdentifier: 'bg1a2b3c-0003-4a7b-8c9d-0e1f2a3b4c5d',
+          universalIdentifier: 'f545cb5a-370d-423f-9b4e-278a9a465bdf',
         },
         {
           fieldValue: 'RETURNED',
           isVisible: true,
           position: 3,
-          universalIdentifier: 'bg1a2b3c-0004-4a7b-8c9d-0e1f2a3b4c5d',
+          universalIdentifier: '5d4c6d5f-af53-4cd0-a843-df38915561b2',
         },
         {
           fieldValue: 'LOST',
           isVisible: true,
           position: 4,
-          universalIdentifier: 'bg1a2b3c-0005-4a7b-8c9d-0e1f2a3b4c5d',
+          universalIdentifier: '5ebbd7dc-9939-4594-b2a0-519269b4531f',
         },
       ],
       icon: 'IconLayoutKanban',
@@ -1570,6 +1580,15 @@ export const EXPECTED_MANIFEST: Manifest = {
       universalIdentifier: 'b1a2b3c4-0005-4a7b-8c9d-0e1f2a3b4c5d',
     },
   ],
+  viewFields: [
+    {
+      fieldMetadataUniversalIdentifier: '7b57bd63-5a4c-46ca-9d52-42c8f02d1df6',
+      isVisible: true,
+      position: 5,
+      universalIdentifier: 'cd582d11-ea21-4dc3-b9c1-0298ce3b6b54',
+      viewUniversalIdentifier: 'b1a2b3c4-0001-4a7b-8c9d-0e1f2a3b4c5d',
+    },
+  ],
   navigationMenuItems: [
     {
       type: NavigationMenuItemType.OBJECT,
@@ -1580,7 +1599,7 @@ export const EXPECTED_MANIFEST: Manifest = {
     {
       type: NavigationMenuItemType.OBJECT,
       position: 0,
-      universalIdentifier: 'c1a2b3c4-0001-4a7b-8c9d-0e1f2a3b4c5d',
+      universalIdentifier: 'e8031eca-d6ea-4a4b-b828-38227dba896a',
       targetObjectUniversalIdentifier: '54b589ca-eeed-4950-a176-358418b85c05',
     },
     {
@@ -1597,7 +1616,6 @@ export const EXPECTED_MANIFEST: Manifest = {
       handlerName: 'default.config.handler',
       name: 'root-function',
       sourceHandlerPath: 'src/root.function.ts',
-      toolInputSchema: { type: 'object', properties: {} },
       timeoutSeconds: 5,
       httpRouteTriggerSettings: {
         httpMethod: 'GET',
@@ -1612,7 +1630,6 @@ export const EXPECTED_MANIFEST: Manifest = {
       handlerName: 'default.config.handler',
       name: 'greeting-function',
       sourceHandlerPath: 'src/logic-functions/greeting.function.ts',
-      toolInputSchema: { type: 'object', properties: {} },
       timeoutSeconds: 5,
       httpRouteTriggerSettings: {
         httpMethod: 'GET',
@@ -1626,16 +1643,18 @@ export const EXPECTED_MANIFEST: Manifest = {
       builtHandlerPath: 'src/logic-functions/lookup-recipient.function.mjs',
       description: 'Look up a recipient by name to find their details',
       handlerName: 'default.config.handler',
-      isTool: true,
       name: 'lookup-recipient',
       sourceHandlerPath: 'src/logic-functions/lookup-recipient.function.ts',
       timeoutSeconds: 5,
-      toolInputSchema: {
-        type: 'object',
-        properties: {
-          recipientName: {
-            type: 'string',
+      toolTriggerSettings: {
+        inputSchema: {
+          type: 'object',
+          properties: {
+            recipientName: {
+              type: 'string',
+            },
           },
+          required: ['recipientName'],
         },
       },
       universalIdentifier: 'a1b2c3d4-1001-4a7b-8c9d-0e1f2a3b4c5d',
@@ -1651,7 +1670,6 @@ export const EXPECTED_MANIFEST: Manifest = {
       name: 'on-post-card-created',
       sourceHandlerPath: 'src/logic-functions/on-post-card-created.function.ts',
       timeoutSeconds: 5,
-      toolInputSchema: { type: 'object', properties: {} },
       universalIdentifier: 'a1b2c3d4-db01-4a7b-8c9d-0e1f2a3b4c5d',
     },
     {
@@ -1660,7 +1678,6 @@ export const EXPECTED_MANIFEST: Manifest = {
       handlerName: 'default.config.handler',
       name: 'test-function-2',
       sourceHandlerPath: 'src/logic-functions/test-function-2.function.ts',
-      toolInputSchema: { type: 'object', properties: {} },
       timeoutSeconds: 2,
       cronTriggerSettings: {
         pattern: '0 0 1 1 *',
@@ -1673,7 +1690,6 @@ export const EXPECTED_MANIFEST: Manifest = {
       handlerName: 'default.config.handler',
       name: 'test-function',
       sourceHandlerPath: 'src/logic-functions/test-function.function.ts',
-      toolInputSchema: { type: 'object', properties: {} },
       timeoutSeconds: 2,
       httpRouteTriggerSettings: {
         forwardedRequestHeaders: ['signature'],

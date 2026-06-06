@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { isNonEmptyString } from '@sniptt/guards';
 import { type Request, type Response } from 'express';
@@ -24,6 +24,8 @@ import { type CustomException } from 'src/utils/custom-exception';
 
 @Injectable()
 export class MiddlewareService {
+  private readonly logger = new Logger(MiddlewareService.name);
+
   constructor(
     private readonly accessTokenService: AccessTokenService,
     private readonly workspaceStorageCacheService: WorkspaceCacheStorageService,
@@ -38,7 +40,7 @@ export class MiddlewareService {
     return !!token;
   }
 
-  // oxlint-disable-next-line @typescripttypescript/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   public writeRestResponseOnExceptionCaught(res: Response, error: any) {
     const statusCode = this.getStatus(error);
 
@@ -61,7 +63,7 @@ export class MiddlewareService {
     res.end();
   }
 
-  // oxlint-disable-next-line @typescripttypescript/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   public writeGraphqlResponseOnExceptionCaught(res: Response, error: any) {
     let errors;
 
@@ -125,21 +127,39 @@ export class MiddlewareService {
       return;
     }
 
-    const data = await this.accessTokenService.validateTokenByRequest(request);
-    const metadataVersion = data.workspace
-      ? await this.workspaceStorageCacheService.getMetadataVersion(
-          data.workspace.id,
-        )
-      : undefined;
+    try {
+      const data =
+        await this.accessTokenService.validateTokenByRequest(request);
+      const metadataVersion = data.workspace
+        ? await this.workspaceStorageCacheService.getMetadataVersion(
+            data.workspace.id,
+          )
+        : undefined;
 
-    bindDataToRequestObject(data, request, metadataVersion);
+      bindDataToRequestObject(data, request, metadataVersion);
+    } catch (error) {
+      // Auth errors are handled by resolver guards, not this middleware.
+      if (error instanceof AuthException) {
+        this.logger.warn(
+          `Token hydration skipped for GraphQL request (code: ${error.code})`,
+        );
+
+        request.locale =
+          (request.headers['x-locale'] as keyof typeof APP_LOCALES) ??
+          SOURCE_LOCALE;
+
+        return;
+      }
+
+      throw error;
+    }
   }
 
   private hasErrorStatus(error: unknown): error is { status: number } {
     return isDefined((error as { status: number })?.status);
   }
 
-  // oxlint-disable-next-line @typescripttypescript/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   private getStatus(error: any): number {
     if (this.hasErrorStatus(error)) {
       return error.status;

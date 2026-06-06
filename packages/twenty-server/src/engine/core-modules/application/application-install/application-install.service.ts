@@ -5,8 +5,6 @@ import { promises as fs } from 'fs';
 import { resolve } from 'path';
 
 import semver from 'semver';
-import { extractFileInfo } from 'src/engine/core-modules/file/utils/extract-file-info.utils';
-import { sanitizeFile } from 'src/engine/core-modules/file/utils/sanitize-file.utils';
 import { Manifest } from 'twenty-shared/application';
 import { FileFolder } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -21,6 +19,10 @@ import { ApplicationRegistrationSourceType } from 'src/engine/core-modules/appli
 import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { ApplicationPackageFetcherService } from 'src/engine/core-modules/application/application-package/application-package-fetcher.service';
+import {
+  ApplicationVersionValidationService,
+  type VersionValidationFailureReason,
+} from 'src/engine/core-modules/application/application-package/application-version-validation.service';
 import { ApplicationSyncService } from 'src/engine/core-modules/application/application-manifest/application-sync.service';
 import { CacheLockService } from 'src/engine/core-modules/cache-lock/cache-lock.service';
 import { FileStorageService } from 'src/engine/core-modules/file-storage/file-storage.service';
@@ -39,11 +41,22 @@ import { LogicFunctionExecutorService } from 'src/engine/core-modules/logic-func
 export class ApplicationInstallService {
   private readonly logger = new Logger(ApplicationInstallService.name);
 
+  private static readonly VERSION_REASON_TO_EXCEPTION_CODE: Record<
+    VersionValidationFailureReason,
+    ApplicationExceptionCode
+  > = {
+    INVALID_REQUIRED_VERSION:
+      ApplicationExceptionCode.INVALID_APP_ENGINE_REQUIREMENT,
+    INVALID_SERVER_VERSION: ApplicationExceptionCode.INVALID_SERVER_VERSION,
+    INCOMPATIBLE: ApplicationExceptionCode.SERVER_VERSION_INCOMPATIBLE,
+  };
+
   constructor(
     @InjectRepository(ApplicationRegistrationEntity)
     private readonly appRegistrationRepository: Repository<ApplicationRegistrationEntity>,
     private readonly applicationService: ApplicationService,
     private readonly applicationPackageFetcherService: ApplicationPackageFetcherService,
+    private readonly applicationVersionValidationService: ApplicationVersionValidationService,
     private readonly applicationSyncService: ApplicationSyncService,
     private readonly fileStorageService: FileStorageService,
     private readonly logicFunctionExecutorService: LogicFunctionExecutorService,
@@ -116,6 +129,27 @@ export class ApplicationInstallService {
 
     if (!resolvedPackage) {
       return true;
+    }
+
+    const requiredServerVersion =
+      resolvedPackage.packageJson.engines?.['twenty'];
+
+    const versionValidation =
+      await this.applicationVersionValidationService.validateServerCompatibility(
+        requiredServerVersion,
+      );
+
+    if (!versionValidation.compatible) {
+      await this.applicationPackageFetcherService.cleanupExtractedDir(
+        resolvedPackage.cleanupDir,
+      );
+
+      throw new ApplicationException(
+        versionValidation.message,
+        ApplicationInstallService.VERSION_REASON_TO_EXCEPTION_CODE[
+          versionValidation.reason
+        ],
+      );
     }
 
     const universalIdentifier = appRegistration.universalIdentifier;
@@ -457,15 +491,8 @@ export class ApplicationInstallService {
         );
       }
 
-      const { mimeType, ext } = await extractFileInfo({
-        file: content,
-        filename: relativePath,
-      });
-      const sanitizedContent = sanitizeFile({ file: content, ext, mimeType });
-
       await this.fileStorageService.writeFile({
-        sourceFile: sanitizedContent,
-        mimeType,
+        sourceFile: content,
         fileFolder,
         applicationUniversalIdentifier,
         workspaceId,

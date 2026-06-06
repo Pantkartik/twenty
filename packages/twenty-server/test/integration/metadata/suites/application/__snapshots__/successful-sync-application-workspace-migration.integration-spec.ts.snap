@@ -31,6 +31,7 @@ exports[`syncApplication should create a TEXT field on the standard Company obje
           "universalSettings": null,
           "updatedAt": Any<String>,
         },
+        "id": Any<String>,
         "metadataName": "fieldMetadata",
         "type": "create",
       },
@@ -206,6 +207,7 @@ exports[`syncApplication should delete old field and create equivalent one when 
             "applicationUniversalIdentifier": Any<String>,
             "createdAt": Any<String>,
             "defaultValue": {
+              "context": null,
               "name": "'System'",
               "source": "'MANUAL'",
               "workspaceMemberId": null,
@@ -236,6 +238,7 @@ exports[`syncApplication should delete old field and create equivalent one when 
             "applicationUniversalIdentifier": Any<String>,
             "createdAt": Any<String>,
             "defaultValue": {
+              "context": null,
               "name": "'System'",
               "source": "'MANUAL'",
               "workspaceMemberId": null,
@@ -410,6 +413,7 @@ exports[`syncApplication should delete old field and create equivalent one when 
           "universalSettings": null,
           "updatedAt": Any<String>,
         },
+        "id": Any<String>,
         "metadataName": "fieldMetadata",
         "type": "create",
       },
@@ -562,6 +566,7 @@ exports[`syncApplication should return workspace migration actions on initial sy
             "applicationUniversalIdentifier": Any<String>,
             "createdAt": Any<String>,
             "defaultValue": {
+              "context": null,
               "name": "'System'",
               "source": "'MANUAL'",
               "workspaceMemberId": null,
@@ -592,6 +597,7 @@ exports[`syncApplication should return workspace migration actions on initial sy
             "applicationUniversalIdentifier": Any<String>,
             "createdAt": Any<String>,
             "defaultValue": {
+              "context": null,
               "name": "'System'",
               "source": "'MANUAL'",
               "workspaceMemberId": null,
